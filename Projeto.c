@@ -1545,13 +1545,13 @@ int NUM_TOKEN_ATUAL=0;
 
 
 //Verifica o proxima token sem "desempilha-lo"
-char lookhead(){
+int lookhead(){
 	 int temp = NUM_TOKEN_ATUAL+ 1;
 	 return SEQ_TOKENS[temp];
 }
 
-bool identificador(){
-	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == IDENTIFICADOR){
+bool identificador(int temp){
+	if(SEQ_TOKENS[temp] == IDENTIFICADOR){
 		return true;
 	}
 	printf("Erro! Identificador invalido");
@@ -1559,34 +1559,32 @@ bool identificador(){
 }
 
 bool chamada_procedimento(){
-	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL];
 	
-	if(temp == IDENTIFICADOR){
-		NUM_TOKEN_ATUAL++;
-
-		if(SEQ_TOKENS[NUM_TOKEN_ATUAL] == PONTOEVIRGULA){
-			NUM_TOKEN_ATUAL++;
+	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == IDENTIFICADOR){
+		int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+		if(temp == PONTOEVIRGULA){
 			return true;
-		} else if(SEQ_TOKENS[NUM_TOKEN_ATUAL] == PARENTESEESQ){
-			NUM_TOKEN_ATUAL++;
-			if( lista_parametros() == true){
-				if(SEQ_TOKENS[NUM_TOKEN_ATUAL] == PONTOEVIRGULA){
-					NUM_TOKEN_ATUAL++;
+		}
+		else if(temp == PARENTESEESQ){
+			if(lista_parametros() == true){
+				if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PONTOEVIRGULA){
 					return true;
 				}
 				else{
+					NUM_TOKEN_ATUAL = NUM_TOKEN_ATUAL-3;
 					printf("Erro! esperava ';'");
 					return false;	
 				}
 			}
-				
-		}
-		else{
+		  NUM_TOKEN_ATUAL--;	
+		}else{
+			NUM_TOKEN_ATUAL = NUM_TOKEN_ATUAL-2;
 			printf("Erro! esperava ';' ou abertura dos parenteses");
 			return false;	
 		}
 		
 	}
+	NUM_TOKEN_ATUAL--;
 	return false;
 }
 
@@ -1594,9 +1592,13 @@ bool lista_parametros(){
 	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL];
 	int look = lookhead();
 	
-	if(temp == PARENTESEDIR){
+	if(temp == PARENTESEESQ){
 		NUM_TOKEN_ATUAL++;
-		return true;
+		int temp2 = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+		if(identificador(temp2) == true or numero(temp2)  == true or bool1(temp2) == true){
+			if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR)
+		}
+		
 	}else if(variavel(temp) && look != VIRGULA){
 		NUM_TOKEN_ATUAL++;
 		return true;
@@ -2003,28 +2005,32 @@ bool declaracao_variaveis(){
 				if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PONTOEVIRGULA)
 					return true;
 				else{
+					NUM_TOKEN_ATUAL=NUM_TOKEN_ATUAL-3;;
 					printf("Erro! esperava ';'");
 					return false;
 				}
-			}
-		}else{
+		 }
+	   }else{
+			NUM_TOKEN_ATUAL=NUM_TOKEN_ATUAL-2;;
 			printf("Erro! esperava ':'");
 			return false;
 		}
 	}
+	NUM_TOKEN_ATUAL--;
 	return false;
 }
 
 bool parte_declaracao_variavel(){
 	if(declaracao_variaveis() == true){
 		int look = lookhead();
-		if(tipo(look) == true)
+		if(tipo(look) = true)
 			parte_declaracao_variavel();
 		else{
 			return true;
 		}
 		
 	}
+	NUM_TOKEN_ATUAL--;
 	return false;
 }
 
@@ -2038,6 +2044,7 @@ bool lista_identificadores(){
 			return true;
 		}
 	}
+	NUM_TOKEN_ATUAL--;
 	return false;
 }
 
@@ -2049,12 +2056,14 @@ bool programa(){
 					return true;
 				}
 				else{
+					NUM_TOKEN_ATUAL--;
 					printf("Erro! esperava palavra reservada 'Fimprograma'");
 					return false;
 				}
 			}	
 		} 
 	}
+	NUM_TOKEN_ATUAL--;
 	printf("Erro! esperava palavra reservada 'Programa'");
 	return false;
 }
