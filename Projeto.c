@@ -30,7 +30,7 @@ typedef int bool;
 #define PARENTESEDIR 122
 #define MAIS 123
 #define MENOS 124
-//#define IGUAL 125
+#define IGUAL 125
 #define MAIOR 126
 #define MENOR 127
 #define MENORIGUAL 128
@@ -1541,12 +1541,12 @@ int scanner(char cod[], int *pos){
 int SEQ_TOKENS[5000];
 
 //Indice do token atual
-int NUM_TOKEN_ATUAL = 0;
+int NUM_TOKEN_ATUAL=0;
 
 
 //Verifica o proxima token sem "desempilha-lo"
 char lookhead(){
-	 int temp = NUM_TOKEN_ATUAL + 1;
+	 int temp = NUM_TOKEN_ATUAL+ 1;
 	 return SEQ_TOKENS[temp];
 }
 
@@ -1556,10 +1556,6 @@ bool identificador(){
 	}
 	printf("Erro! Identificador invalido");
 	return false;
-}
-
-void declara_func(){
-	
 }
 
 bool chamada_procedimento(){
@@ -1649,7 +1645,7 @@ bool variavel(int temp){
 
 bool expressao(){
 	if(expressao_simples() == true){
-		temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+		int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
 		if(relacao(temp) == true){
 			if(expressao_simples() == true){
 				return true;
@@ -1664,7 +1660,8 @@ bool expressao(){
 }
 
 bool atribuicao(){
-	if(variavel() == true) {
+	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+	if(variavel(temp) == true) {
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == ATRIBUICAO){
 			if(expressao() == true){
 				return true;
@@ -1678,7 +1675,7 @@ bool atribuicao(){
 	return false;
 }
 
-bool comando_condicional(){
+bool comando_condicional(){	
 	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == SE){
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEESQ){
 			if(expressao() == true){
@@ -1754,7 +1751,7 @@ bool comando_repetitivo(){
 }
 
 bool comando(){
-	//N�o sei quando � atribui��o , chamada de procedimento ou comando condicional
+	//Não sei quando é atribuição , chamada de procedimento ou comando condicional
 	if(lookhead()  == IDENTIFICADOR)
 		return atribuicao();
 	else if(lookhead() == IDENTIFICADOR)
@@ -1790,7 +1787,7 @@ bool comando(){
 bool termo(){
 	if(fator() == true){
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEESQ){
-			temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+			int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
 			if(temp == MUL || temp == DIV){
 				if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR){
 					if(fator() == true){
@@ -1884,8 +1881,10 @@ bool fator(){
 		return true;
 	else if(bool1(temp))
 		return true;
-	else if(temp == PARENTESEESQ);
+	else if(temp == PARENTESEESQ) return true;
+	//ver aki
 }
+
 bool comando_composto(){
 	if(comando() && SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PONTOEVIRGULA){
 			
@@ -1893,52 +1892,59 @@ bool comando_composto(){
 }
 
 bool bloco(){
-    //Pelo que entendi aqui tem 4 possibilidades:
-    // 1 -> ter declaracao de variaveis, de procedimentos e (obrigatorio) comando composto
-    // 2 -> ter declaracao de variaveis, e (obrigatorio) comando composto
-    // 3 -> ter declaracao de procedimentos e (obrigatorio) comando composto
-    // 4 -> ter só o comando composto
-
-//	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
-
-    //Possibilidade 1
-    //Como é opcional, faz um lookahead pra olhar sem desempilhar
-    if(lookhead() == declaracao_variavel()) {
-        //Faz outro para identificar a segunda camada de opcionais
-	    if(lookhead() == chamada_procedimento()) {
-	        //Se chegou até aqui, agora temos que realmente desempilhar 2 vezes.
-	        int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
-	        //Verifica se é comando composto e retorna true
-	        if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
-	            return true;
-	        }
-	    }
+	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+	if(temp == true){
+		//erros aki
+	}else if(true){
+	}else if(comando_composto() == true){
+		
 	}
-    //Possibilidade 2
-    //Como é opcional, faz um lookahead pra olhar sem desempilhar
-    if(lookhead() == declaracao_variavel()) {
-        //Aqui só estamos uma camada dentro então só desempilha uma vez
-        //Verifica se é comando composto e retorna true
-        if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
-            return true;
-        }
-    }
-    //Possibilidade 3
-    //Quase a mesma coisa da possiblidade 3, só troca declaracao_variavel por chamada_procedimento
-    if(lookhead() == chamada_procedimento()) {
-        //Verifica se é comando composto e retorna true
-        if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
-            return true;
-        }
-    }
-    //Possibilidade 4
-    //Só checa o comando_composto
-    if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()) {
-        return true;
-    }
+	return false;
+	
+}
 
-    //Se não caiu em nenhuma das probabiidades de cima, retorna falso;
-    return false;
+bool declaracao_procedimento(){
+	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PROCEDIMENTO){
+		if(identificador() == true){
+			if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEESQ){
+				if(parametros_formais() == true){
+					if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR){
+						if(bloco() == true){
+							if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == FIMPROCEDIMENTO)
+								return true;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+bool parametros_formais(){
+	if(parametro_formal() == true){
+		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == VIRGULA){
+			parametros_formais();
+		}
+		else{
+			return true;
+		}
+	}
+	
+}
+
+bool parametro_formal(){
+	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+	if(tipo(temp) == true){
+		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == DOISPONTOS){
+			if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == IDENTIFICADOR)
+				return true;
+		}
+		else{
+			printf("Erro! esperava um ':'");
+			return false;
+		}
+	}
+	return false;
 }
 
 bool tipo(int temp){
@@ -1952,7 +1958,7 @@ bool tipo(int temp){
 	}
 }
 
-void declaracao_variavel(){
+bool declaracao_variaveis(){
 	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
 	if(tipo(temp) == true){
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == DOISPONTOS){
@@ -1968,6 +1974,19 @@ void declaracao_variavel(){
 			printf("Erro! esperava ':'");
 			return false;
 		}
+	}
+	return false;
+}
+
+bool parte_declaracao_variavel(){
+	if(declaracao_variaveis() == true){
+		int look = lookhead();
+		if(tipo(look) == true)
+			parte_declaracao_variavel();
+		else{
+			return true;
+		}
+		
 	}
 	return false;
 }
@@ -2014,7 +2033,7 @@ int main(){
     int result;
     char buf[40];
     int ch, i=0;
-	result = fprintf(arqGrava, "LOG DE EXECU��O\n\n");
+	result = fprintf(arqGrava, "LOG DE EXECUÇÃO\n\n");
     while (EOF != (ch = fgetc(arq))) {
     	
     	if (isspace(ch)) {
@@ -2044,10 +2063,10 @@ int main(){
     	
     }
     
-    //Aqui come�a o identificador sintatico
+    //Aqui começa o identificador sintatico
     NUM_TOKEN_ATUAL=0;
     
-    bool is_valid = programa();
+    bool is_valid = comando_condicional();
     if(is_valid == true)
     	printf("Sintaxe valida!");
     else
