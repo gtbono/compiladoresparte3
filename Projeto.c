@@ -1892,15 +1892,52 @@ bool comando_composto(){
 }
 
 bool bloco(){
-	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
-	if(temp == true){
-		//erros aki
-	}else if(true){
-	}else if(comando_composto() == true){
-		
+    //Pelo que entendi aqui tem 4 possibilidades:
+    // 1 -> ter declaracao de variaveis, de procedimentos e (obrigatorio) comando composto
+    // 2 -> ter declaracao de variaveis, e (obrigatorio) comando composto
+    // 3 -> ter declaracao de procedimentos e (obrigatorio) comando composto
+    // 4 -> ter só o comando composto
+
+//	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+
+    //Possibilidade 1
+    //Como é opcional, faz um lookahead pra olhar sem desempilhar
+    if(lookhead() == declaracao_variavel()) {
+        //Faz outro para identificar a segunda camada de opcionais
+	    if(lookhead() == chamada_procedimento()) {
+	        //Se chegou até aqui, agora temos que realmente desempilhar 2 vezes.
+	        int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
+	        //Verifica se é comando composto e retorna true
+	        if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
+	            return true;
+	        }
+	    }
 	}
-	return false;
-	
+    //Possibilidade 2
+    //Como é opcional, faz um lookahead pra olhar sem desempilhar
+    if(lookhead() == declaracao_variavel()) {
+        //Aqui só estamos uma camada dentro então só desempilha uma vez
+        //Verifica se é comando composto e retorna true
+        if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
+            return true;
+        }
+    }
+    //Possibilidade 3
+    //Quase a mesma coisa da possiblidade 3, só troca declaracao_variavel por chamada_procedimento
+    if(lookhead() == chamada_procedimento()) {
+        //Verifica se é comando composto e retorna true
+        if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
+            return true;
+        }
+    }
+    //Possibilidade 4
+    //Só checa o comando_composto
+    if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()) {
+        return true;
+    }
+
+    //Se não caiu em nenhuma das probabiidades de cima, retorna falso;
+    return false;
 }
 
 bool declaracao_procedimento(){
@@ -1922,7 +1959,7 @@ bool declaracao_procedimento(){
 
 bool parametros_formais(){
 	if(parametro_formal() == true){
-		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == VIRGULA){
+	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == VIRGULA){
 			parametros_formais();
 		}
 		else{
