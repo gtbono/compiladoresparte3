@@ -2041,8 +2041,7 @@ bool parte_declaracao_variavel(){
 }
 
 bool lista_identificadores(){
-	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL];
-	if(identificador(temp) == true){
+	if(identificador(SEQ_TOKENS[NUM_TOKEN_ATUAL++]) == true){
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == VIRGULA ){
 			lista_identificadores();
 		}
@@ -2122,7 +2121,7 @@ int main(){
 			printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL++]);
 
     //bool is_valid = comando_condicional();
-    bool is_valid = programa();
+    bool is_valid = lista_identificadores();
     if(is_valid == true)
     	printf("Sintaxe valida!");
     else
