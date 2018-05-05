@@ -1595,8 +1595,8 @@ bool lista_parametros(){
 	if(temp == PARENTESEESQ){
 		NUM_TOKEN_ATUAL++;
 		int temp2 = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
-		if(identificador(temp2) == true or numero(temp2)  == true or bool1(temp2) == true){
-			if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR)
+		if(identificador(temp2) == true || numero(temp2)  == true || bool1(temp2) == true){
+			if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR);
 		}
 		
 	}else if(variavel(temp) && look != VIRGULA){
@@ -1683,9 +1683,9 @@ bool comando_condicional(){
 			if(expressao() == true){
 				if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR){
 					if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == ENTAO){
-						if(comando() == true){
+						if(comando_composto() == true){
 							if(lookhead() == SENAO){
-								if(comando() == true){
+								if(comando_composto() == true){
 									if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == FIMSE)
 										return true;
 								}
@@ -1765,7 +1765,7 @@ bool comando(){
 	else if (lookhead() == ESCREVA){
 		NUM_TOKEN_ATUAL++;
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEESQ){
-			if(identificador() == true){
+			if(identificador(SEQ_TOKENS[NUM_TOKEN_ATUAL++]) == true){
 				if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR){
 					if(comando() && SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PONTOEVIRGULA){
 						return true;
@@ -1889,8 +1889,14 @@ bool fator(){
 
 bool comando_composto(){
 	if(comando() && SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PONTOEVIRGULA){
-			
+	    return true;
 	}
+
+	if(comando() && lookhead() == comando()) {
+	    return true;
+	}
+
+	return false;
 }
 
 bool bloco(){
@@ -1944,7 +1950,7 @@ bool bloco(){
 
 bool declaracao_procedimento(){
 	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PROCEDIMENTO){
-		if(identificador() == true){
+		if(identificador(SEQ_TOKENS[NUM_TOKEN_ATUAL++]) == true){
 			if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEESQ){
 				if(parametros_formais() == true){
 					if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PARENTESEDIR){
@@ -2023,9 +2029,9 @@ bool declaracao_variaveis(){
 bool parte_declaracao_variavel(){
 	if(declaracao_variaveis() == true){
 		int look = lookhead();
-		if(tipo(look) = true)
+		if(tipo(look) == true) {
 			parte_declaracao_variavel();
-		else{
+		}else{
 			return true;
 		}
 		
@@ -2050,7 +2056,7 @@ bool lista_identificadores(){
 
 bool programa(){
 	if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == PROGRAMA){
-		if(identificador() == true){
+		if(identificador(SEQ_TOKENS[NUM_TOKEN_ATUAL++]) == true){
 			if(bloco() == true){
 				if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == FIMPROGRAMA){
 					return true;
@@ -2109,9 +2115,14 @@ int main(){
     }
     
     //Aqui começa o identificador sintatico
-    NUM_TOKEN_ATUAL=0;
-    
-    bool is_valid = comando_condicional();
+    NUM_TOKEN_ATUAL = 0;
+
+    //debug
+    		printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL]);
+			printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL++]);
+
+    //bool is_valid = comando_condicional();
+    bool is_valid = programa();
     if(is_valid == true)
     	printf("Sintaxe valida!");
     else
