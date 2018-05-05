@@ -2004,6 +2004,7 @@ bool tipo(int temp){
 }
 
 bool declaracao_variaveis(){
+    
 	int temp = SEQ_TOKENS[NUM_TOKEN_ATUAL++];
 	if(tipo(temp) == true){
 		if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == DOISPONTOS){
@@ -2117,11 +2118,11 @@ int main(){
     NUM_TOKEN_ATUAL = 0;
 
     //debug
-    		printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL]);
-			printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL++]);
+//    		printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL++]);
+//            printf("%d",SEQ_TOKENS[NUM_TOKEN_ATUAL]);
 
     //bool is_valid = comando_condicional();
-    bool is_valid = lista_identificadores();
+    bool is_valid = parametros_formais();
     if(is_valid == true)
     	printf("Sintaxe valida!");
     else
