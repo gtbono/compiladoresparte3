@@ -1902,7 +1902,7 @@ bool bloco(){
 
     //Possibilidade 1
     //Como é opcional, faz um lookahead pra olhar sem desempilhar
-    if(lookhead() == declaracao_variavel()) {
+    if(lookhead() == parte_declaracao_variavel()) {
         //Faz outro para identificar a segunda camada de opcionais
 	    if(lookhead() == chamada_procedimento()) {
 	        //Se chegou até aqui, agora temos que realmente desempilhar 2 vezes.
@@ -1915,7 +1915,7 @@ bool bloco(){
 	}
     //Possibilidade 2
     //Como é opcional, faz um lookahead pra olhar sem desempilhar
-    if(lookhead() == declaracao_variavel()) {
+    if(lookhead() == parte_declaracao_variavel()) {
         //Aqui só estamos uma camada dentro então só desempilha uma vez
         //Verifica se é comando composto e retorna true
         if(SEQ_TOKENS[NUM_TOKEN_ATUAL++] == comando_composto()){
@@ -2095,7 +2095,6 @@ int main(){
 			buf[i] = ch;
 			printf("%c",buf[i]);
 			i++;
-			
 		}
     	
     }
